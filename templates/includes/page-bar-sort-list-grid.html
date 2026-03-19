@@ -1,0 +1,22 @@
+<div class="page-bar clearfix">
+    <!-- Sort Dropdown -->
+    <div class="toolbar-sorter">
+        <div class="select-box-wrapper">
+            <form method="get">
+                {% for key, value in request.GET.items %}
+                    {% if key != 'sort' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+
+                <select class="select-box" id="sort-by" name="sort" onchange="this.form.submit()">
+                    <option value="">  Sort By:      .....   </option>
+                    <option value="latest" {% if request.GET.sort == 'latest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if request.GET.sort == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="lowest" {% if request.GET.sort == 'lowest' %}selected{% endif %}>Amount: Low to High</option>
+                    <option value="highest" {% if request.GET.sort == 'highest' %}selected{% endif %}>Amount: High to Low</option>
+                </select>
+            </form>
+        </div>
+    </div>
+</div>

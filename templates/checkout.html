@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title  %}CheckOut Page{% endblock title %}
+
+{% block style-link %}
+    <style>
+        .coupon-item {
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 6px 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        @media (min-width: 1200px) {
+    .container {
+        max-width: 1850px;
+    }
+}
+    </style>
+{% endblock style-link %}
+
+{% block page-bredcrumb %}
+    <!-- {% include "includes/page-bredcrumbs.html" %} -->
+{% endblock page-bredcrumb %}
+
+{% block main-content %}
+
+<!-- Checkout-Page -->
+<div class="page-checkout u-s-p-t-80">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <form method="POST" action="{% url 'checkout' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <!-- Billing-&-Shipping-Details -->
+                        <div class="col-lg-6">
+                            <h4 class="section-h4">Coupons Applied</h4>
+                            <!-- Form-Fields -->
+                            <div class="applied-coupons u-s-m-b-13">
+                                <!-- Dynamic Coupon Items Will Go Here -->
+                                {% if not coupon_code %}
+                                    <div id="no-coupons" style="display: block; color: gray;">No coupons applied</div>
+                                {% else%}
+                                    <div id="coupon-list">
+                                        <div class="coupon-item">{{coupon_code}}</div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Billing-&-Shipping-Details /- -->
+                        <!-- Checkout -->
+                        <div class="col-lg-6">
+                            <h4 class="section-h4">Your Order</h4>
+                            <div class="order-table">
+                                <table class="u-s-m-b-13">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in cart_items %}
+                                            <tr>
+                                                <td>
+                                                    <h6 class="order-h6">{{ item.product.name }}</h6>
+                                                    <span class="order-span-quantity">x {{ item.quantity }}</span>
+                                                </td>
+                                                <td>
+                                                    <h6 class="order-h6">${{ item.item_subtotal }}</h6>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        <tr>
+                                            <td>
+                                                <h3 class="order-h3">Subtotal</h3>
+                                            </td>
+                                            <td>
+                                                <h3 class="order-h3">${{ subtotal }}</h3>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h3 class="order-h3">Discount</h3>
+                                            </td>
+                                            <td>
+                                                <h3 class="order-h3">-${{ discount }}</h3>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <h3 class="order-h3">Total</h3>
+                                            </td>
+                                            <td>
+                                                <h3 class="order-h3">${{ total }}</h3>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                
+                                <!-- Payment Method Options -->
+                                <div class="u-s-m-b-13">
+                                    <input type="radio" class="radio-box" name="payment-method" id="cash-on-delivery" value="cash-on-delivery">
+                                    <label class="label-text" for="cash-on-delivery">Cash on Delivery</label>
+                                </div>
+
+                                <div class="u-s-m-b-13">
+                                    <input type="radio" class="radio-box" name="payment-method" id="pay-now" value="pay-now">
+                                    <label class="label-text" for="pay-now">Pay Now</label>
+                                </div>
+
+                                <!-- Pay Now Options -->
+                                <div id="pay-now-options" style="display: none; margin-left: 20px;">
+                                    <div class="u-s-m-b-13">
+                                        <input type="radio" name="pay-type" id="pay-full" value="pay-fully">
+                                        <label for="pay-full">Pay Full Amount</label>
+                                    </div>
+                                    <div class="u-s-m-b-13">
+                                        <input type="radio" name="pay-type" id="pay-advance" value="pay-advance">
+                                        <label for="pay-advance">Pay Advance</label>
+                                    </div>
+
+                                    <!-- Payment Method (Credit / UPI) -->
+                                    <div id="payment-method-type" style="display: none; margin-left: 20px;">
+                                        <div class="u-s-m-b-13">
+                                            <input type="radio" name="payment-method-type" id="credit-card" value="credit-card">
+                                            <label for="credit-card">Credit Card</label>
+                                        </div>
+                                        <div class="u-s-m-b-13">
+                                            <input type="radio" name="payment-method-type" id="upi" value="upi">
+                                            <label for="upi">UPI</label>
+                                        </div>
+
+                                        <!-- Transaction Details -->
+                                        <div id="transaction-fields" style="display: none; margin-left: 20px;">
+                                            <div class="u-s-m-b-13">
+                                                <label for="transaction-id">Transaction ID</label>
+                                                <input type="text" name="transaction-id" id="transaction-id" class="text-field" placeholder="Enter Transaction ID">
+                                            </div>
+                                            <div class="u-s-m-b-13">
+                                                <label for="payment-amount">Amount</label>
+                                                <input type="text" name="payment-amount" id="payment-amount" class="text-field" placeholder="Enter Paid Amount">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="button button-outline-secondary">Place Order</button>
+                            </div>
+                        </div>
+                        <!-- Checkout /- -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Checkout-Page /- -->
+
+{% endblock main-content %}
+
+{% block script-links %}
+<script>
+    const payNowRadio = document.getElementById("pay-now");
+    const codRadio = document.getElementById("cash-on-delivery");
+    const payNowOptions = document.getElementById("pay-now-options");
+
+    const payFullRadio = document.getElementById("pay-full");
+    const payAdvanceRadio = document.getElementById("pay-advance");
+    const paymentMethodType = document.getElementById("payment-method-type");
+
+    const creditCardRadio = document.getElementById("credit-card");
+    const upiRadio = document.getElementById("upi");
+    const transactionFields = document.getElementById("transaction-fields");
+
+    payNowRadio.addEventListener("change", () => {
+        payNowOptions.style.display = "block";
+    });
+
+    codRadio.addEventListener("change", () => {
+        payNowOptions.style.display = "none";
+        paymentMethodType.style.display = "none";
+        transactionFields.style.display = "none";
+    });
+
+    [payFullRadio, payAdvanceRadio].forEach(el => {
+        el.addEventListener("change", () => {
+            paymentMethodType.style.display = "block";
+        });
+    });
+
+    [creditCardRadio, upiRadio].forEach(el => {
+        el.addEventListener("change", () => {
+            transactionFields.style.display = "block";
+        });
+    });
+</script>
+{% endblock script-links %}

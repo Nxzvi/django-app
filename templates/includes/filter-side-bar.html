@@ -1,0 +1,55 @@
+<div class="col-lg-2 col-md-3 col-sm-12">
+    <!-- Filters -->
+    <h3 class="title-name">Filter Orders</h3>
+    <form class="facet-form" method="get">
+        <!-- Filter: Order Stage -->
+        <div class="facet-filter-associates">
+            <h3 class="title-name">Order Stage</h3>
+            <div class="associate-wrapper">
+                {% for value, label in order_stage_choices %}
+                    <input type="checkbox" class="check-box" name="order_stage" value="{{ value }}" id="stage-{{ value }}" {% if value in active_filters.order_stage %}checked{% endif %}>
+                    <label class="label-text" for="stage-{{ value }}">{{ label }}</label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Filter: Payment Mode -->
+        <div class="facet-filter-associates">
+            <h3 class="title-name">Payment Mode</h3>
+            <div class="associate-wrapper">
+                {% for value, label in payment_mode_choices %}
+                    <input type="checkbox" class="check-box" name="payment_mode" value="{{ value }}" id="paymode-{{ value }}" {% if value in active_filters.payment_mode %}checked{% endif %}>
+                    <label class="label-text" for="paymode-{{ value }}">{{ label }}</label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Filter: Payment Status -->
+        <div class="facet-filter-associates">
+            <h3 class="title-name">Payment Status</h3>
+            <div class="associate-wrapper">
+                {% for value, label in payment_status_choices %}
+                    <input type="checkbox" class="check-box" name="payment_status" value="{{ value }}" id="status-{{ value }}" {% if value in active_filters.payment_status %}checked{% endif %}>
+                    <label class="label-text" for="status-{{ value }}">{{ label }}</label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Filter: Date Range -->
+        <div class="facet-filter-associates mt-3">
+            <h3 class="title-name">Date Range</h3>
+            <div class="d-flex flex-column gap-2">
+                <label class="label-text" for="start_date">From</label>
+                <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.GET.start_date|default:'' }}">
+                <label class="label-text" for="end_date">To</label>
+                <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.GET.end_date|default:'' }}">
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-between mt-3">
+            <button type="submit" class="button button-primary">Filter</button>
+            <a href="{% url 'orders' %}" class="button button-secondary">Clear Filters</a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,158 @@
+{% load static %}
+<!DOCTYPE html>
+<html class="no-js" lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <!--[if IE]>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>{% block title  %}Groover{% endblock title %}</title>
+    <!-- Standard Favicon -->
+    <link href="favicon.ico" rel="shortcut icon">
+    <!-- Base Google Font for Web-app -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
+    <!-- Google Fonts for Banners only -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,800" rel="stylesheet">
+    <!-- Bootstrap 4 -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- Font Awesome 5 -->
+    <link rel="stylesheet" href="{% static 'css/fontawesome.min.css' %}">
+    <!-- Ion-Icons 4 -->
+    <link rel="stylesheet" href="{% static 'css/ionicons.min.css' %}">
+    <!-- Animate CSS -->
+    <link rel="stylesheet" href="{% static 'css/animate.min.css' %}">
+    <!-- Owl-Carousel -->
+    <link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+    <!-- Jquery-Ui-Range-Slider -->
+    <link rel="stylesheet" href="{% static 'css/jquery-ui-range-slider.min.css' %}">
+    <!-- Utility -->
+    <link rel="stylesheet" href="{% static 'css/utility.css' %}">
+    <!-- Main -->
+    <link rel="stylesheet" href="{% static 'css/bundle.css' %}">
+    
+    {% block style-link %}
+    
+    {% endblock style-link %}
+</head>
+
+<body>
+
+<!-- app -->
+<div id="app">
+
+    {% if messages %}
+    <script>
+        {% for message in messages %}
+            alert("{{ message|escapejs }}");
+        {% endfor %}
+    </script>
+    {% endif %}
+
+    <!-- Header -->
+    {% block header %}
+        {% include "includes/header.html" %}
+    {% endblock header %}
+    <!-- Header /- -->
+
+    <!-- Main-Slider -->
+    {% block main-slider %}
+
+    {% endblock main-slider %}
+    <!-- Main-Slider /- -->
+
+    <!-- Page Introduction Wrapper -->
+    {% block page-bredcrumb %}
+        
+    {% endblock page-bredcrumb %}
+    <!-- Page Introduction Wrapper /- -->
+
+    {% block main-content %}
+
+    {% endblock main-content %}
+
+    <!-- Dummy Selectbox -->
+    <div class="select-dummy-wrapper">
+        <select id="compute-select">
+            <option id="compute-option">All</option>
+        </select>
+    </div>
+    <!-- Dummy Selectbox /- -->
+
+    <!-- Responsive-Search -->
+    {% include "includes/mob-search.html" %}
+    <!-- Responsive-Search /- -->
+
+    <!-- Quick-view-Modal -->
+    {% include "includes/product-quick-view.html" %}
+    <!-- Quick-view-Modal /- -->
+</div>
+<!-- app /- -->
+
+<!-- NoScript -->
+<noscript>
+    <div class="app-issue">
+        <div class="vertical-center">
+            <div class="text-center">
+                <h1>JavaScript is disabled in your browser.</h1>
+                <span>Please enable JavaScript in your browser or upgrade to a JavaScript-capable browser to register for Groover.</span>
+            </div>
+        </div>
+    </div>
+    <style>
+    #app {
+        display: none;
+    }
+    </style>
+</noscript>
+
+<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+<script>
+window.ga = function() {
+    ga.q.push(arguments)
+};
+ga.q = [];
+ga.l = +new Date;
+ga('create', 'UA-XXXXX-Y', 'auto');
+ga('send', 'pageview')
+</script>
+<script src="https://www.google-analytics.com/analytics.js" async defer></script>
+
+<!-- Modernizr-JS -->
+<script type="text/javascript" src="{% static 'js/vendor/modernizr-custom.min.js' %}"></script>
+<!-- NProgress -->
+<script type="text/javascript" src="{% static 'js/nprogress.min.js' %}"></script>
+<!-- jQuery -->
+<script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+<!-- Bootstrap JS -->
+<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+<!-- Popper -->
+<script type="text/javascript" src="{% static 'js/popper.min.js' %}"></script>
+<!-- ScrollUp -->
+<script type="text/javascript" src="{% static 'js/jquery.scrollUp.min.js' %}"></script>
+<!-- Elevate Zoom -->
+<script type="text/javascript" src="{% static 'js/jquery.elevatezoom.min.js' %}"></script>
+<!-- jquery-ui-range-slider -->
+<script type="text/javascript" src="{% static 'js/jquery-ui.range-slider.min.js' %}"></script>
+<!-- jQuery Slim-Scroll -->
+<script type="text/javascript" src="{% static 'js/jquery.slimscroll.min.js' %}"></script>
+<!-- jQuery Resize-Select -->
+<script type="text/javascript" src="{% static 'js/jquery.resize-select.min.js' %}"></script>
+<!-- jQuery Custom Mega Menu -->
+<script type="text/javascript" src="{% static 'js/jquery.custom-megamenu.min.js' %}"></script>
+<!-- jQuery Countdown -->
+<script type="text/javascript" src="{% static 'js/jquery.custom-countdown.min.js' %}"></script>
+<!-- Owl Carousel -->
+<script type="text/javascript" src="{% static 'js/owl.carousel.min.js' %}"></script>
+<!-- Main -->
+<script type="text/javascript" src="{% static 'js/app.js' %}"></script>
+
+{% block script-links %}
+
+{% endblock script-links %}
+
+</body>
+</html>

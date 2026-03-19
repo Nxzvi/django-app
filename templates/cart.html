@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+
+{% block title %}Cart Page{% endblock title %}
+
+{% block style-link %}
+<style>
+    .coupon-status-card {
+    margin-top: 10px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    color: #333;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.coupon-status-card.applied {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.coupon-status-card.invalid {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1850px;
+    }
+}
+</style>
+{% endblock style-link %}
+
+{% block page-bredcrumb %}
+<!-- {% include "includes/page-bredcrumbs.html" %} -->
+{% endblock page-bredcrumb %}
+
+{% block main-content %}
+
+<!-- Cart-Page -->
+<div class="page-cart u-s-p-t-80">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <form>
+                    <!-- Products-List-Wrapper -->
+                    <div class="table-wrapper u-s-m-b-60">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-items-body">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Products-List-Wrapper /- -->
+                    <!-- Coupon -->
+                    <div class="coupon-continue-checkout u-s-m-b-60">
+                        <div class="coupon-area">
+                            <h6>Enter your coupon code if you have one.</h6>
+                            <div class="coupon-field">
+                                <label class="sr-only" for="coupon-code">Apply Coupon</label>
+                                <input id="coupon-code" type="text" class="text-field" placeholder="Coupon Code">
+                                <button type="submit" class="button" id="apply-coupon">Apply Coupon</button>
+                                <button type="button" class="button" id="clear-coupon" style="display:none; color: black; background-color:brown;">Clear Coupon</button>
+                            </div>
+
+                            <!-- Status Card -->
+                            <div id="coupon-status" class="coupon-status-card">
+                                Not applied yet
+                            </div>
+                        </div>
+                        <div class="button-area">
+                            <a href="{% url 'product-list' %}" class="continue">Add New Product</a>
+                            <a href="{% url 'proceed-to-checkout' %}" class="checkout">Proceed to Checkout</a>
+                        </div>
+                    </div>
+                    <!-- Coupon /- -->
+                </form>
+                <!-- Billing -->
+                <div class="calculation u-s-m-b-60">
+                    <div class="table-wrapper-2">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th colspan="2">Cart Totals</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <h3 class="calc-h3 u-s-m-b-0">Subtotal</h3>
+                                    </td>
+                                    <td><span class="calc-text" id="subtotal-amount">$0.00</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h3 class="calc-h3 u-s-m-b-0" id="tax-heading">Discount</h3>
+                                        <span>(estimated based on Coupon)</span>
+                                    </td>
+                                    <td><span class="calc-text" id="discount-amount">$0.00</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <h3 class="calc-h3 u-s-m-b-0">Total</h3>
+                                    </td>
+                                    <td><span class="calc-text" id="total-amount">$0.00</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Billing /- -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cart-Page /- -->
+
+{% endblock main-content %}
+
+{% block script-links %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    
+        const tbody = document.getElementById("cart-items-body");
+
+        function loadCartItems() {
+            fetch("/get-cart-items/")
+                .then(response => {
+                    if (!response.ok) throw new Error("No cart or items found.");
+                    return response.json();
+                })
+                .then(data => {
+                    tbody.innerHTML = "";
+                    cartId = data.cart_id;
+                    data.items.forEach(item => {
+                        const subtotal = (item.price_per_unit * item.quantity).toFixed(2);
+                        const row = `
+                        <tr data-item-id="${item.product_id}">
+                            <td>
+                                <div class="cart-anchor-image">
+                                    <a href="single-product.html">
+                                        <img src="images/product/product@1x.jpg" alt="Product">
+                                        <h6>${item.product_name}</h6>
+                                    </a>
+                                </div>
+                            </td>
+                            <td><div class="cart-price">$${item.price_per_unit.toFixed(2)}</div></td>
+                            <td>
+                                <div class="cart-quantity">
+                                    <div class="quantity">
+                                        <input type="text" class="quantity-text-field" value="${item.quantity}" readonly>
+                                        <a class="plus-a" data-id="${item.product_id}" data-action="increase" data-cart="${cartId}">&#43;</a>
+                                        <a class="minus-a" data-id="${item.product_id}" data-action="decrease" data-cart="${cartId}">&#45;</a>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><div class="cart-price subtotal">$${subtotal}</div></td>
+                            <td>
+                                <div class="action-wrapper">
+                                    <button type="button" class="button button-outline-secondary fas fa-trash" data-id="${item.product_id}" data-action="remove" data-cart="${cartId}"></button>
+                                </div>
+                            </td>
+                        </tr>`;
+                        tbody.insertAdjacentHTML("beforeend", row);
+                    });
+
+                    attachEventListeners();
+                    updateCartTotals();  // ✅ ADD THIS
+                })
+
+                .catch(error => {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">${error.message}</td></tr>`;
+                });
+        }
+
+        function attachEventListeners() {
+            tbody.querySelectorAll(".plus-a, .minus-a").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const row = btn.closest("tr");
+                    const itemId = btn.dataset.id;
+                    const cartId = btn.dataset.cart;
+                    const action = btn.dataset.action;
+                    const input = row.querySelector(".quantity-text-field");
+                    let currentQty = parseInt(input.value);
+
+                    if (action === "increase") currentQty++;
+                    if (action === "decrease" && currentQty > 1) currentQty--;
+
+                    if (action === "decrease" && currentQty === 1) {
+                        // Call remove function if quantity is 1
+                        removeItem(itemId, cartId);
+                    }
+
+                    updateQuantity(itemId, currentQty, cartId);
+                });
+            });
+
+            tbody.querySelectorAll(".fa-trash").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    const itemId = btn.dataset.id;
+                    const cartId = btn.dataset.cart;
+                    removeItem(itemId, cartId);
+                });
+            });
+        }
+
+        function updateQuantity(itemId, quantity, cartId) {
+            fetch("/update-cart-item/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+                body: JSON.stringify({ item_id: itemId, quantity, cart_id: cartId })
+            })
+                .then(response => response.json())
+                .then(() => loadCartItems());
+        }
+
+        function removeItem(itemId, cartId) {
+            fetch("/remove-cart-item/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+                body: JSON.stringify({ item_id: itemId, cart_id: cartId })
+            })
+                .then(response => response.json())
+                .then(() => loadCartItems());
+        }
+
+        function getCSRFToken() {
+            const name = "csrftoken";
+            const cookies = document.cookie.split(";");
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + "=")) {
+                    return decodeURIComponent(cookie.substring(name.length + 1));
+                }
+            }
+            return "";
+        }
+
+        loadCartItems();
+    });
+</script>
+
+<script>
+    function updateCartTotals() {
+        let subtotal = 0;
+        const subtotalEls = document.querySelectorAll(".cart-price.subtotal");
+
+        console.log("Found", subtotalEls.length, "subtotal elements");
+
+        subtotalEls.forEach(el => {
+            const value = parseFloat(el.textContent.replace('$', '')) || 0;
+            console.log("Item subtotal:", value);
+            subtotal += value;
+        });
+
+        const discount = 0;
+        const total = subtotal - discount;
+
+        console.log("Subtotal:", subtotal);
+        console.log("Discount:", discount);
+        console.log("Total:", total);
+
+        document.getElementById("subtotal-amount").textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById("discount-amount").textContent = `-$${discount.toFixed(2)}`;
+        document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        updateCartTotals();
+    });
+</script>
+
+<script>
+document.getElementById('apply-coupon').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const code = document.getElementById('coupon-code').value.trim();
+    const status = document.getElementById('coupon-status');
+
+    if (!code) {
+        status.textContent = "Please enter a coupon code.";
+        status.className = "coupon-status-card invalid";
+        return;
+    }
+
+    fetch(`/validate-coupon/?code=${encodeURIComponent(code)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'valid') {
+                status.textContent = data.message;
+                status.className = "coupon-status-card applied";
+
+                let subtotalText = document.getElementById("subtotal-amount").textContent;
+                let subtotal = parseFloat(subtotalText.replace(/[^0-9.]/g, ''));
+
+                let discount = data.discount_amount;
+                
+
+                document.getElementById("discount-amount").textContent = `-$${discount.toFixed(2)}`;
+                
+                const total = subtotal - discount;
+                document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
+
+                document.getElementById('clear-coupon').style.display = "inline-block";
+            } else {
+                status.textContent = data.message;
+                status.className = "coupon-status-card invalid";
+                document.getElementById("discount-amount").textContent = `-$0.00`;
+                document.getElementById('clear-coupon').style.display = "none";
+            }
+        })
+        .catch(() => {
+            status.textContent = "Something went wrong while applying the coupon.";
+            status.className = "coupon-status-card invalid";
+        });
+});
+
+document.getElementById('clear-coupon').addEventListener('click', function () {
+
+    fetch('/clear-coupon/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    });
+
+    document.getElementById('coupon-code').value = "";
+    document.getElementById('coupon-status').textContent = "Coupon cleared.";
+    document.getElementById('coupon-status').className = "coupon-status-card";
+    document.getElementById('discount-amount').textContent = "- $0.00";
+    this.style.display = "none";
+
+    let subtotalText = document.getElementById("subtotal-amount").textContent;
+    let subtotal = parseFloat(subtotalText.replace(/[^0-9.]/g, ''));
+
+    const total = subtotal - discount;
+    document.getElementById("total-amount").textContent = `$${total.toFixed(2)}`;
+});
+</script>
+
+{% endblock script-links %}

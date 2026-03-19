@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title  %}All Products{% endblock title %}
+
+{% block style-link %}
+    <style>
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+
+        .card h4 {
+            font-size: 1rem;
+            margin: 5px 0;
+        }
+
+        .card .price {
+            color: green;
+            font-weight: bold;
+        }
+
+        .card button {
+            background-color: #e32428;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 1850px;
+            }
+        }
+        .u-s-p-t-80 {
+            padding-top: 0px;
+        }
+    </style>
+{% endblock style-link %}
+
+{% block page-bredcrumb %}
+    <!-- {% include "includes/page-bredcrumbs.html" %} -->
+{% endblock page-bredcrumb %}
+
+{% block main-content %}
+
+<div class="page-cart u-s-p-t-80">
+    <div class="container justify-content-center">
+        <div class="row">
+
+            <div class="page-bar clearfix">
+                <!-- Search by User -->
+                <div class="toolbar-search">
+                    <form method="get" class="d-flex align-items-center gap-2">
+                        <input type="text" name="search" class="form-control" placeholder="Search Product" value="{{ request.GET.search|default:'' }}">
+                        <button type="submit" class="button button-primary">Search</button>
+                    </form>
+                </div>
+            </div>
+
+            {% for product in page_obj %}
+                <div class="col-3">
+                    <div class="card">
+                        <img src="images/product1.jpg" alt="{{ product.name }}">
+                        <h3>{{ product.name }}</h3>
+                        <h4>{{ product.category.name }}</h4>
+                        <p class="price">${{ product.price }}</p>
+                        <button class="add-to-cart" data-id="{{ product.id }}">Add to Cart</button>
+                    </div>
+                </div>
+            {% empty %}
+                <div id="coupon-status" class="coupon-status-card">
+                    No Products Found
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination controls -->
+        <div class="mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&laquo;</span>
+                        </li>
+                    {% endif %}
+
+                    {% with total_pages=page_obj.paginator.num_pages current=page_obj.number %}
+                        {% if total_pages > 1 %}
+                            {% if current > 2 %}
+                                <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                                {% if current > 3 %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if num >= current|add:"-1" and num <= current|add:"1" %}
+                                    {% if num == current %}
+                                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                    {% else %}
+                                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if current < total_pages|add:"-1" %}
+                                {% if current < total_pages|add:"-2" %}
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                {% endif %}
+                                <li class="page-item"><a class="page-link" href="?page={{ total_pages }}">{{ total_pages }}</a></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">&raquo;</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div> 
+
+{% endblock main-content %}
+
+{% block script-links %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".add-to-cart").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const productId = this.dataset.id;
+
+            fetch("/add-to-cart/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken()
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(err => {
+                alert("Error adding to cart.");
+                console.error(err);
+            });
+        });
+    });
+
+    function getCSRFToken() {
+        const name = "csrftoken";
+        const cookies = document.cookie.split(";");
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + "=")) {
+                return decodeURIComponent(cookie.substring(name.length + 1));
+            }
+        }
+        return "";
+    }
+});
+</script>
+
+{% endblock script-links %}

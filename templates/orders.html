@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Order Page{% endblock title %}
+
+{% block style-link %}
+<style>
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+.pagination .step-links a,
+.pagination .step-links span {
+    margin: 0 5px;
+    text-decoration: none;
+    color: #333;
+}
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1850px;
+    }
+}
+.justify-content-between {
+    justify-content: space-evenly !important;
+}
+.u-s-p-t-80 {
+    padding-top: 0px;
+}
+</style>
+{% endblock style-link %}
+
+{% block page-bredcrumb %}
+<!-- {% include "includes/page-bredcrumbs.html" %} -->
+{% endblock page-bredcrumb %}
+
+{% block main-content %}
+
+<div class="page-cart u-s-p-t-80">
+    <div class="container">
+        <div class="row">
+
+            {% include "includes/page-bar-sort-list-grid.html" %}
+
+            {% include "includes/filter-side-bar.html" %}
+
+            <div class="col-lg-9 col-md-9 col-sm-12">
+                    <!-- Products-List-Wrapper -->
+                    <div class="table-wrapper u-s-m-b-60">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order Id</th>
+                                    <th>Order Stage</th>
+                                    <th>Payment Mode</th>
+                                    <th>Payment Status</th>
+                                    <th>Order Amount</th>
+                                    <th>Payed Amount</th>
+                                    <th>Balance Amount</th>
+                                    <th>Ordered Items</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-items-body">
+                                {% for order in page_obj %}
+                                    <tr>
+                                        <td>{{ order.id }}</td>
+                                        <td>{{ order.order_stage }}</td>
+                                        <td>{{ order.payment_mode }}</td>
+                                        <td>{{ order.payment_status }}</td>
+                                        <td>{{ order.order_amount }}</td>
+                                        <td>{{ order.payed_amount }}</td>
+                                        <td>{{ order.balance_amount }}</td>
+                                        <td>
+                                            <ul>
+                                                {% for item in order.items %}
+                                                    <li>{{ item }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </td>
+                                        <td>{{ order.date }}</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr><td colspan="9">No orders found.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Products-List-Wrapper /- -->
+
+                    <!-- Pagination controls -->
+                    <div class="mt-4">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+
+                                {# Previous Button #}
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                        href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                        aria-label="Previous">&laquo;</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                                {% endif %}
+
+                                {% with total_pages=page_obj.paginator.num_pages current=page_obj.number %}
+                                    {% if total_pages > 1 %}
+                                        {% if current > 2 %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">1</a>
+                                            </li>
+                                            {% if current > 3 %}
+                                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                                            {% endif %}
+                                        {% endif %}
+
+                                        {% for num in page_obj.paginator.page_range %}
+                                            {% if num >= current|add:"-1" and num <= current|add:"1" %}
+                                                {% if num == current %}
+                                                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                                                {% else %}
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+
+                                        {% if current < total_pages|add:"-1" %}
+                                            {% if current < total_pages|add:"-2" %}
+                                                <li class="page-item disabled"><span class="page-link">...</span></li>
+                                            {% endif %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ total_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ total_pages }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endwith %}
+
+                                {# Next Button #}
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link"
+                                        href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}"
+                                        aria-label="Next">&raquo;</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                                {% endif %}
+
+                            </ul>
+                        </nav>
+                    </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Cart-Page /- -->
+
+{% endblock main-content %}
+
+{% block script-links %}
+
+
+
+{% endblock script-links %}
