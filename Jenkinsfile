@@ -3,12 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Code') {
-            steps {
-                git 'https://github.com/Nxzvi/django-app.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker-compose build'
@@ -26,6 +20,5 @@ pipeline {
                 sh 'docker-compose up -d'
             }
         }
-
     }
 }
